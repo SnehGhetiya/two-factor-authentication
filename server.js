@@ -87,6 +87,7 @@ app.post("/api/validate", (req, res) => {
 		const user = db.getData(path);
 		// taking encoded base32 value from the database
 		const { base32: secret } = user.temp_secret;
+		const username = user.username;
 
 		// validating the token
 		const validated = speakeasy.totp.verify({
@@ -99,7 +100,7 @@ app.post("/api/validate", (req, res) => {
 		// if valid, then return success message and storing that token permanently into the database else return error message
 		if (validated) {
 			res.status(200).send({ message: "Valid token" });
-			db.push(path, { id, token: user.temp_secret.base32 });
+			db.push(path, { id, username, token: user.temp_secret.base32 });
 		} else {
 			res.status(400).send({ message: "Invalid token" });
 		}
